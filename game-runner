@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# get list of libraries
+# 	if args supplied: libs = args
+# 	else: process library folders file
+# 		match lines with "path"
+# 		extract the full path from said lines using the " delimiter trick
+# 	for each lib:
+# 		for each acf in lib:
+# 			extract game id and name
+#
+
+#libs=""
+#if [ $# -eq 0 ] ; then
+#	 parse libs from vdf
+#	vdf="${HOME}/.local/share/Steam/steamapps/libraryfolders.vdf"
+#	if [ -e $vdf ]; then
+#		libs=$(awk -F'"' '/"path"/ { print $4 }' $vdf)
+#	else
+#		echo "can't autodetect libraries - supply them as arguments"
+#		exit
+#	fi
+#else
+#	libs=$@
+#fi
+
+if [ $# -eq 0 ]; then
+	vdf="${HOME}/.local/share/Steam/steamapps/libraryfolders.vdf"
+else
+	vdf=$1
+fi
+
+if [ -e $vdf ]; then
+	libs=$(awk -F'"' '/"path"/ { print $4 }' $vdf)
+else
+	echo "unable to read $vdf - file does not exist"
+	exit
+fi
+
+IFSNORMAL=$IFS
+IFSNEWLINE=$(echo -en "\n\b")
+IFS=$IFSNEWLINE
+
+tmpfile=$(mktemp)
+for lib in $libs; do
+	for file in $lib/steamapps/*.acf; do
+		appid=$(awk -F'"' '/"appid"/ { print $4 }' $file)
+		name=$(awk -F'"' '/"name"/ { print tolower($4) }' $file)
+		echo $name:$appid >> $tmpfile 
+	done
+done
+
+sort -o $tmpfile $tmpfile
+
+game=$(cat $tmpfile | wmenu)
+selection=$(echo $game | awk -F':' '{ print $2 }')
+rm $tmpfile
+steam steam://rungameid/$selection
