@@ -1,29 +1,24 @@
 #!/bin/bash
 
-# get list of libraries
-# 	if args supplied: libs = args
-# 	else: process library folders file
-# 		match lines with "path"
-# 		extract the full path from said lines using the " delimiter trick
-# 	for each lib:
-# 		for each acf in lib:
-# 			extract game id and name
-#
+# set the location of the vdf file
+# 	if no args given: use default location
+# 	else: assume argument is user specified vdf location
+# if the vdf exists, use awk to extract path values from vdf
+# else: show warning to user and exit
+# set bash IFS value to newline
+# 	bash tokenises using the IFS variable (defaulting to space)
+# 	this breaks if a steam library has a space in it
+# 	using an alternate value fixed the issue
+# generate a tmpfile to save game data
+# for every detected library:
+# 	for every appmanifest file in library:
+# 		extract the app name and id, then save in the tmpfile
+# sort the tmpfile to alphabetise the games
+# cat the tmpfile into wmenu to prompt the user to select a game
+# extract the game id from the user selection
+# run the game through steam
 
-#libs=""
-#if [ $# -eq 0 ] ; then
-#	 parse libs from vdf
-#	vdf="${HOME}/.local/share/Steam/steamapps/libraryfolders.vdf"
-#	if [ -e $vdf ]; then
-#		libs=$(awk -F'"' '/"path"/ { print $4 }' $vdf)
-#	else
-#		echo "can't autodetect libraries - supply them as arguments"
-#		exit
-#	fi
-#else
-#	libs=$@
-#fi
-
+## process the vdf file
 if [ $# -eq 0 ]; then
 	vdf="${HOME}/.local/share/Steam/steamapps/libraryfolders.vdf"
 else
@@ -37,6 +32,7 @@ else
 	exit
 fi
 
+## process the app manifest files
 IFSNORMAL=$IFS
 IFSNEWLINE=$(echo -en "\n\b")
 IFS=$IFSNEWLINE
@@ -50,9 +46,11 @@ for lib in $libs; do
 	done
 done
 
+## prompt the user to pick a game via wmenu
 sort -o $tmpfile $tmpfile
-
 game=$(cat $tmpfile | wmenu)
+
+## extract game id from user selection and run
 selection=$(echo $game | awk -F':' '{ print $2 }')
 rm $tmpfile
 steam steam://rungameid/$selection
