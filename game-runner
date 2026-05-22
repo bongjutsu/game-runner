@@ -20,11 +20,12 @@
 
 ## process the vdf file
 if [ $# -eq 0 ]; then
-	vdf="${HOME}/.local/share/Steam/steamapps/libraryfolders.vdf"
+	vdf="${HOME}/.steam/steam/steamapps/libraryfolders.vdf"
 else
 	vdf=$1
 fi
 
+# with quotes as the delimiter, the path will be the 4th column
 if [ -e $vdf ]; then
 	libs=$(awk -F'"' '/"path"/ { print $4 }' $vdf)
 else
