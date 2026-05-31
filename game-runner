@@ -18,6 +18,8 @@
 # extract the game id from the user selection
 # run the game through steam
 
+launcher="wmenu"
+
 ## process the vdf file
 if [ $# -eq 0 ]; then
 	vdf="${HOME}/.steam/steam/steamapps/libraryfolders.vdf"
@@ -30,7 +32,7 @@ if [ -e $vdf ]; then
 	libs=$(awk -F'"' '/"path"/ { print $4 }' $vdf)
 else
 	echo "unable to read $vdf - file does not exist"
-	exit
+	exit 1
 fi
 
 ## process the app manifest files
@@ -49,8 +51,9 @@ done
 
 ## prompt the user to pick a game via wmenu
 sort -o $tmpfile $tmpfile
-game=$(cat $tmpfile | wmenu)
+game=$(cat $tmpfile | $launcher)
 
+if [[ -z $game ]]; then exit 2; fi
 ## extract game id from user selection and run
 selection=$(echo $game | awk -F':' '{ print $2 }')
 rm $tmpfile

@@ -16,7 +16,8 @@ game-runner /path/to/your/Steam/libraryfolders.vdf
 ```
 
 ## Use with other launchers
-My script assumes you use `wmenu` (because I use `wmenu`). Presumably you could just find/replace `wmenu` in the script with your launcher of choice, eg `dmenu`, but I haven't tested that, so that's a you problem.
+The `launcher` variable at the top of the script is the launcher to use. The default is `wmenu` but I've tested it with `dmenu` as well. Presumably it works with the other launchers that are out there but I haven't tested them. 
 
-## Final Words
-I consider this script to be feature complete so I'm not expecting to publish any meaningful updates unless it breaks. Right now, it does have one bug - if you have a Steam library with no games, awk will throw an error for that library, and add a dummy option to the selection (it's just a colon). It doesn't have any meaningful effect - you can run installed games just fine, so I won't bother fixing it.
+## Error codes
+Code 1: could not find `libraryfolders.vdf`
+Code 2: user aborted selecting a game
