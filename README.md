@@ -1,23 +1,24 @@
 # Game Runner
-Script to allow launching Steam installed games via `wmenu`/`dmenu`/tiling WM application launcher
+Script to allow launching Steam installed games via `dmenu`-like window manager application launchers
 
-## How It Works
-1. Run `game-runner`
-2. Make a selection in the `wmenu` prompt that appears
-3. ???
-4. Profit
+## Dependencies
+1. `steam`
+2. `bash`
+3. `wmenu` - you can use other launchers by tweaking the script, see [below](#usage)
 
-Steam maintains a file called `libraryfolders.vdf` which contains all of your Steam libraries. I have my games installed across multiple partitions, and thus use multiple libraries. First, the script processes `libraryfolders.vdf` to get all local libraries, then it iterates through those directories to parse the `appmanifest_XXXXXX.acf` files inside those libraries. The `appmanifest_XXXXXX.acf` files contain information about installed games - most notably for this use case, the `appid` and `name` keys. You can use `appid` values to launch games using Steam's own protocol - eg, `steam://rungameid//570` for Dota 2. But people prefer to read the `name`, so I convert that to lower case for autocompletion laziness, then when the script runs I can just type `dota` to autocomplete for dota 2, and we're off to the races.
-
-## Troubleshooting
-If you use this script, and for some reason your `libraryfolders.vdf` isn't in the same location as mine, you can provide it as a command line argument:
+## Usage
 ```
-game-runner /path/to/your/Steam/libraryfolders.vdf
+game-runner [-v path/to/libraryfolders.vdf] [-l launcher] 
 ```
+1. You only need to supply the libraryfolders.vdf location if the script can't find it
+2. If you want to use a launcher other than `wmenu`, specify it with the `-l` argument, eg `-l dmenu`
 
-## Use with other launchers
-The `launcher` variable at the top of the script is the launcher to use. The default is `wmenu` but I've tested it with `dmenu` as well. Presumably it works with the other launchers that are out there but I haven't tested them. 
+Tested with launchers `wmenu`, `dmenu` and `bemenu` but if your launcher of choice takes arbitrary lines from `stdin` and outputs the selection to `stdout` then it should work as well.
 
-## Error codes
-Code 1: could not find `libraryfolders.vdf`
-Code 2: user aborted selecting a game
+## Installation
+Optional, but suggested: add the script to your $PATH
+
+Add a hotkey in your window manager configuration to invoke the script. Example configuration line for sway:
+```
+bindsym $mod+g exec game-runner
+```

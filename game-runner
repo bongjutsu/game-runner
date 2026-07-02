@@ -18,16 +18,21 @@
 # extract the game id from the user selection
 # run the game through steam
 
+# set defaults
 launcher="wmenu"
+vdf="${HOME}/.steam/steam/steamapps/libraryfolders.vdf"
 
-## process the vdf file
-if [ $# -eq 0 ]; then
-	vdf="${HOME}/.steam/steam/steamapps/libraryfolders.vdf"
-else
-	vdf=$1
-fi
+# process args
+OPTIND=1
 
-# with quotes as the delimiter, the path will be the 4th column
+while getopts ":v:l:": opt; do
+	case $opt in
+		l) launcher=$OPTARG ;;
+		v) vdf=$OPTARG ;;
+	esac
+done
+
+# with quotes as the delimiter, the full path to each steam library will be the 4th column
 if [ -e $vdf ]; then
 	libs=$(awk -F'"' '/"path"/ { print $4 }' $vdf)
 else
