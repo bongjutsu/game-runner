@@ -45,7 +45,7 @@ for lib in $libs; do
 	for file in $lib/steamapps/*.acf; do
 		appid=$(awk -F'"' '/"appid"/ { print $4 }' $file)
 		name=$(awk -F'"' '/"name"/ { print tolower($4) }' $file)
-		echo $name:$appid >> $tmpfile 
+		echo $name::$appid >> $tmpfile 
 	done
 done
 
@@ -55,6 +55,6 @@ game=$(cat $tmpfile | $launcher)
 
 if [[ -z $game ]]; then exit 2; fi
 ## extract game id from user selection and run
-selection=$(echo $game | awk -F':' '{ print $2 }')
+selection=$(echo $game | awk -F'::' '{ print $2 }')
 rm $tmpfile
 steam steam://rungameid/$selection
