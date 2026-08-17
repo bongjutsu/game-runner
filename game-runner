@@ -54,6 +54,12 @@ for lib in $libs; do
 	done
 done
 
+## extract non steam games
+# find screenshots.vdf
+
+screenshots=$(find ~/.steam/steam/userdata | grep screenshots.vdf)
+awk -F'"' '/"shortcutnames"/{f=1; next} f && /^ *}/{f=0} f && NF>=5 {print tolower($4) "::" $2}' $screenshots >> $tmpfile
+
 ## prompt the user to pick a game via wmenu
 sort -o $tmpfile $tmpfile
 game=$(cat $tmpfile | $launcher)
